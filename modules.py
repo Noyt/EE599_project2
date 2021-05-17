@@ -1,6 +1,7 @@
 from torch import empty
 from torch import tensor
 from torch.nn import Linear
+import math
 
 
 class Module(object):
@@ -26,12 +27,16 @@ class Linear(Module):
         self.in_features = in_features
         self.out_features = out_features
 
-        self.weights = empty((out_features, in_features)) # TODO handle proper initialization + CHANGE in/out stuff
-        self.bias = empty(out_features)
+        self.weights = empty((out_features, in_features)) # TODO handle proper initialization
+        self.bias = empty((out_features, 1))
 
         # Backward pass information
-        self.input = empty(in_features)
-        self.output = empty(out_features)
+        self.input = empty((in_features, 1))
+        self.output = empty((out_features, 1))
+
+        # Module update information
+        self.gradwrtweights = empty((out_features, in_features))
+        self.gradwrtbias = empty((out_features, 1))
 
     def forward(self, input: tensor) -> tensor:
         # Forward computation
@@ -45,17 +50,17 @@ class Linear(Module):
 
     def backward(self, gradwrtoutput, lr):
         # Computing updates
-        gradwrtweights = gradwrtoutput @ self.input.transpose(0,-1) # TODO check dimensions match
-        gradwrtbias = gradwrtoutput
+        self.gradwrtweights = gradwrtoutput @ self.input.transpose(0,-1)
+        self.gradwrtbias = gradwrtoutput
 
         # Propagation
         gradwrtinput = self.weights.transpose(-1,0) @ gradwrtoutput
 
-        # Updating parameters
-        self.weights -= lr * gradwrtweights
-        self.bias -= lr * gradwrtbias
-
         return gradwrtinput
+
+    def update(self, func, **kwargs):
+        self.weights = func(self.weights, self.gradwrtweights, kwargs)
+        self.bias = func(self.bias, self.gradwrtbias, kwargs)
 
     def param(self):
         return [self.weights, self.bias]
@@ -91,11 +96,21 @@ class ReLU(Module):
 
 
 class Tanh(Module):
-    def forward(self, *input):
-        raise NotImplementedError
+    def __init__(self):
+        self.input = None
 
-    def backward(self, *gradwrtoutput):
-        raise NotImplementedError
+    def forward(self, *input):
+        # Forward computation
+        output = input.apply_(math.tanh)
+
+        # Recording information for backward pass
+        self.input = input
+        return output
+
+    def backward(self, gradwrtinput):
+        derivative = input.apply_(lambda x: 1.0/(math.cosh(x)**2))
+        gradwrtoutput = gradwrtinput * derivative
+        return gradwrtoutput
 
     def param(self):
         return []
