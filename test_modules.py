@@ -1,5 +1,5 @@
 import torch
-
+from torch import nn
 from modules import *
 
 
@@ -26,4 +26,6 @@ class TestModel:
 
         model_output = model.forward(input)
         print(model_output)
+
+
 

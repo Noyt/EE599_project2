@@ -1,5 +1,4 @@
 from torch import empty
-from math import log, exp
 from torch import tensor
 from torch.nn import Linear
 import math
@@ -181,7 +180,7 @@ class CrossEntropyLoss(Module):
         self.x = predictions
         self.y = actual
         for i in range(len(actual)):
-            loss += -predictions[i, actual[i]] + log(sum(exp(predictions[i])))
+            loss += -predictions[i, actual[i]] + (predictions[i].exp()).sum().log()
         return loss/len(actual)
 
     def backward(self):
@@ -189,7 +188,7 @@ class CrossEntropyLoss(Module):
         for i in range(len(self.x)):
             row = self.x[i]
             pred = self.y[i]
-            grad[i] = 1/sum(exp(row)) * exp(row) #The derivation is this for each value of x_i
+            grad[i] = 1/row.exp().sum() * row.exp() #The derivation is this for each value of x_i
             grad[i, pred] -= 1 #Need to subtract by -1 for the sample that is correct
 
         return grad/len(self.y) #Need to normalize
