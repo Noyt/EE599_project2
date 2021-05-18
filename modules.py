@@ -1,4 +1,5 @@
-from torch import empty, mean, log, sum, exp
+from torch import empty
+from math import log, exp
 from torch import tensor
 from torch.nn import Linear
 import math
@@ -88,7 +89,7 @@ class ReLU(Module):
 
         gradwrtoutput = gradwrtinput*derivative
 
-        return  gradwrtoutput
+        return gradwrtoutput
 
     def param(self):
         return []
@@ -115,14 +116,40 @@ class Tanh(Module):
 
 
 class Sequential(Module):
-    def forward(self, *input):
-        raise NotImplementedError
+
+    def __init__(self, *modules : Module): #Need to pass Module in Sequential
+        self.seq = list()
+        for module in modules:
+            self.seq.append(module)
+
+    def forward(self, input) -> tensor :
+        for module in self.seq:
+            output = module.forward(input)
+            input = output
+        return output
 
     def backward(self, *gradwrtoutput):
-        raise NotImplementedError
+        output = gradwrtoutput
+        for module in self.seq[::-1]: #Goes through module in reverse order
+            output = module.backward(output)
 
     def param(self):
-        return []
+        linear_layers = []
+        for module in self.seq:
+            if isinstance(module, Linear):
+                linear_layers.append(module)
+        return linear_layers
+
+
+class SGD(Module):
+    def __init__(self, parameters, lr):
+        self.parameters = parameters
+        self.lr = lr
+
+    def step(self):
+        for module in self.parameters:
+            module.update(lambda args, gradients, lr: args - lr * gradients, {"lr": self.lr}) #Pass the SGD func to the layers
+
 
 class MSELoss(Module):
     """
@@ -133,7 +160,7 @@ class MSELoss(Module):
 
     def forward(self, predictions, target)->tensor:
         self.error = (predictions-target)
-        return mean(self.error.pow(2)) # 1/N * sum((x-y)^2)
+        return self.error.pow(2).mean() # 1/N * sum((x-y)^2)
 
     def backward(self):
         return (2/len(self.error))* self.error #grad error = 2/N * (x-y)

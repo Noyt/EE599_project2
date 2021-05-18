@@ -16,3 +16,14 @@ class TestLinear:
         assert torch.equal(gradwrtinput, torch.ones((2,1))*6)
         #assert torch.equal(lin.weights, torch.ones((3,2))*0.98) # Weight update
         #assert torch.equal(lin.bias, torch.ones((3,1))*0.98)# bias update
+
+class TestModel:
+    def test_model(self):
+        model = Sequential(Linear(1,1), ReLU())
+        optimizer = SGD(parameters=model.param(), lr=0.1)
+        input = torch.tensor([[1]])
+        true = torch.tensor([[0]])
+
+        model_output = model.forward(input)
+        print(model_output)
+
