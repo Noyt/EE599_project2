@@ -20,3 +20,12 @@ def generate_train_test(nb_pairs=1000):
     test_data, test_labels = inputs[nb_pairs:], labels[nb_pairs:]
 
     return train_data, test_data, train_labels, test_labels
+
+
+def calculate_gain(activation_name: str):
+    if activation_name.lower() == "relu":
+        return math.sqrt(2)
+    elif activation_name.lower() == 'tanh':
+        return  5.0/3.0
+    else:
+        return 1

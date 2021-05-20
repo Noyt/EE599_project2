@@ -1,5 +1,5 @@
 import torch
-
+import math
 from torch import nn
 from modules import *
 
@@ -52,6 +52,34 @@ class TestLinear:
         assert 1 == loss
         assert 2 == mse.backward()
 
+    def test_activations(self):
+        input = torch.tensor([[2.0, 2.0],
+                              [2.0, 2.0],
+                              [-1.0, -1.0]])
+        ones = torch.ones((3,2))
+        relu = ReLU()
+        output = relu.forward(input)
+        assert output.equal(torch.tensor([[2.0, 2.0],
+                                            [2.0, 2.0],
+                                            [0.0, 0.0]]))
+        backres = relu.backward(ones)
+        assert backres.equal(torch.tensor([[1.0, 1.0],
+                                            [1.0, 1.0],
+                                            [0.0, 0.0]]))
+        tanh = Tanh()
+        output = tanh.forward(input)
+        tanh2 = math.tanh(2.0)
+        tanh1 = math.tanh(-1.0)
+        assert output.equal(torch.tensor([[tanh2, tanh2],
+                                          [tanh2, tanh2],
+                                          [tanh1, tanh1]]))
+
+        backres = tanh.backward(ones)
+        dev_tanh2 = 1 / (math.cosh(2.0) ** 2)
+        dev_tanh1 = 1 / (math.cosh(-1.0) ** 2)
+        assert backres.equal(torch.tensor([[dev_tanh2, dev_tanh2],
+                                           [dev_tanh2, dev_tanh2],
+                                           [dev_tanh1, dev_tanh1]]))
 
 class TestModel:
     def test_model(self):

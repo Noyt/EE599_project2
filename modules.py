@@ -1,6 +1,6 @@
 from torch import empty
 from torch import tensor
-from torch.nn import Linear
+
 import math
 
 
@@ -24,13 +24,16 @@ class Linear(Module):
     Fully connected layer, performs linear combinations of input and adds bias, for the required number of outputs
     """
 
-    def __init__(self, in_features, out_features):
+    def __init__(self, in_features, out_features, gain=1.0):
         # Inherent attributes
         self.in_features = in_features
         self.out_features = out_features
 
-        self.weights = empty((out_features, in_features))  # TODO handle proper initialization
-        self.bias = empty((out_features, 1))
+        # Weight initialization (Xavier)
+        self.weights = empty((out_features, in_features))
+        std = gain * math.sqrt(2.0 / (in_features + out_features))
+        self.weights.normal_(0, std)
+        self.bias = empty((out_features, 1)).new_zeros((out_features, 1))
 
         # Backward pass information
         self.input = empty((in_features, 1))
@@ -102,16 +105,16 @@ class Tanh(Module):
     def __init__(self):
         self.input = None
 
-    def forward(self, *input):
+    def forward(self, input):
         # Forward computation
-        output = input.apply_(math.tanh)
+        output = input.clone().apply_(math.tanh)
 
         # Recording information for backward pass
         self.input = input
         return output
 
     def backward(self, gradwrtinput):
-        derivative = input.apply_(lambda x: 1.0 / (math.cosh(x) ** 2))
+        derivative = self.input.clone().apply_(lambda x: 1.0 / (math.cosh(x) ** 2))
         gradwrtoutput = gradwrtinput * derivative
         return gradwrtoutput
 
