@@ -8,8 +8,8 @@ def generate_train_test(nb_pairs=1000):
     and corresponding label of appartenance to circle centered on [0.5, 0.5] of radius 1/sqrt(2pi),
     for both training and testing sets
     """
-    labels = empty(nb_pairs * 2)
-    inputs = empty((nb_pairs * 2, 2)).uniform_()
+    labels = empty(nb_pairs * 2, 1)
+    inputs = empty((nb_pairs * 2, 2, 1)).uniform_()
 
     max_radius = 1 / ((2 * math.pi) ** (1 / 2))
     for i, input_ in enumerate(inputs):
