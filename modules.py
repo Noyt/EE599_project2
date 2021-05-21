@@ -193,15 +193,14 @@ class CrossEntropyLoss(Module):
         self.x = predictions
         self.y = actual
         for i in range(len(actual)):
-            loss += -predictions[i, actual[i]] + (predictions[i].exp()).sum().log()
+            loss += -predictions[int(actual[i].item())] + (predictions.exp()).sum().log()
+
         return loss / len(actual)
 
     def backward(self):
         grad = empty(self.x.shape)
         for i in range(len(self.x)):
-            row = self.x[i]
-            pred = self.y[i]
-            grad[i] = 1 / row.exp().sum() * row.exp()  # The derivation is this for each value of x_i
-            grad[i, pred] -= 1  # Need to subtract by -1 for the sample that is correct
+            grad[i] = 1 / self.x.exp().sum() * self.x[i].exp()  # The derivation is this for each value of x_i
 
+        grad[int(self.y.item())] -= 1  # Need to subtract by -1 for the sample that is correct
         return grad / len(self.y)  # Need to normalize

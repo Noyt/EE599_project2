@@ -20,10 +20,10 @@ model = Sequential(
     ReLU(),
     Linear(25, 25, gain),
     ReLU(),
-    Linear(25,1)
+    Linear(25, 2)
 )
 
-criterion = MSELoss()
+criterion = CrossEntropyLoss()
 optimizer = SGD(parameters=model.param(), lr=0.01)
 
 
