@@ -162,7 +162,7 @@ class SGD(Module):
 
 class MSELoss(Module):
     """
-    Mean squared Loss: performs 1/N * sum(prediction - target)
+    Mean squared Loss: performs (prediction - target)^2
     """
 
     def __init__(self):
@@ -170,10 +170,10 @@ class MSELoss(Module):
 
     def forward(self, predictions, target) -> tensor:
         self.error = (predictions - target)
-        return self.error.pow(2).mean()  # 1/N * sum((x-y)^2)
+        return self.error.pow(2)  # (x-y)^2
 
     def backward(self):
-        return (2 / len(self.error)) * self.error  # grad error = 2/N * (x-y)
+        return 2 * self.error  # grad error = 2 * (x-y)
 
     def param(self):
         return []
@@ -200,7 +200,7 @@ class CrossEntropyLoss(Module):
     def backward(self):
         grad = empty(self.x.shape)
         for i in range(len(self.x)):
-            grad[i] = 1 / self.x.exp().sum() * self.x[i].exp()  # The derivation is this for each value of x_i
+            grad[i] = self.x[i].exp() / self.x.exp().sum()  # The derivation is this for each value of x_i
 
         grad[int(self.y.item())] -= 1  # Need to subtract by -1 for the sample that is correct
         return grad / len(self.y)  # Need to normalize
