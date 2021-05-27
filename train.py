@@ -24,12 +24,10 @@ def train(model, optimizer, criterion, train_set, train_target, test_set, test_t
             val_loss += criterion.forward(model_output, target).data.item()
             if type(criterion) == CrossEntropyLoss:
                 found_val = helpers.softmax(model_output).argmax()
-                if found_val == target:
+                if found_val == target.item():
                     num_correct += 1
 
         val_loss = val_loss/len(test_set)
-
-
 
         if type(criterion) == CrossEntropyLoss:
             print(

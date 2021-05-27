@@ -73,7 +73,7 @@ class Linear(Module):
 
 class ReLU(Module):
     """
-    TODO
+    Perform element wise Rectified Linear Unit operation on given tensor
     """
 
     def __init__(self):
@@ -88,20 +88,23 @@ class ReLU(Module):
         self.input = input
         return output
 
-    def backward(self, gradwrtinput):
+    def backward(self, gradwrtoutput):
         ones = empty(self.input.size()).new_ones(self.input.size())
         zeros = empty(self.input.size()).new_zeros(self.input.size())
         derivative = ones.where(self.input > 0, zeros)
 
-        gradwrtoutput = gradwrtinput * derivative
+        gradwrtinput = gradwrtoutput * derivative
 
-        return gradwrtoutput
+        return gradwrtinput
 
     def param(self):
         return []
 
 
 class Tanh(Module):
+    """
+    Perform element wise Tanh operation on given tensor
+    """
     def __init__(self):
         self.input = None
 
@@ -113,10 +116,10 @@ class Tanh(Module):
         self.input = input
         return output
 
-    def backward(self, gradwrtinput):
+    def backward(self, gradwrtoutput):
         derivative = self.input.clone().apply_(lambda x: 1.0 / (math.cosh(x) ** 2))
-        gradwrtoutput = gradwrtinput * derivative
-        return gradwrtoutput
+        gradwrtinput = gradwrtoutput * derivative
+        return gradwrtinput
 
     def param(self):
         return []
@@ -181,7 +184,7 @@ class MSELoss(Module):
 
 class CrossEntropyLoss(Module):
     """
-    Cross Entropy Loss: Criterion that combines LogSoftmax and NLLLoss in one single class.
+    Given predictions and targets, compute cross entropy loss
     """
 
     def __init__(self):

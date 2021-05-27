@@ -2,6 +2,7 @@ from torch import empty
 from torch import tensor
 import math
 
+
 def generate_train_test(nb_pairs=1000):
     """
     Generates nb_pairs 2-dimensional data points with coordinates in [0,1]
@@ -29,6 +30,7 @@ def calculate_gain(activation_name: str):
         return  5.0/3.0
     else:
         return 1
+
 
 def softmax(input: tensor):
     """Computes the softmax of the input which is : softmax(i) = exp(input(i))/sum(exp(input(j)))"""
