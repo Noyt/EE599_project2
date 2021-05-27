@@ -1,6 +1,7 @@
 from torch import empty
 from torch import tensor
 import math
+import os
 
 
 def generate_train_test(nb_pairs=1000):
@@ -38,3 +39,13 @@ def calculate_gain(activation_name: str):
 def softmax(input: tensor):
     """Computes the softmax of the input which is : softmax(i) = exp(input(i))/sum(exp(input(j)))"""
     return input.exp()/sum(input.exp())
+
+
+def check_path_and_create(path):
+    if not os.path.exists(path):
+        os.mkdir(path)
+
+
+def create_folders_structure():
+    current = os.getcwd()
+    check_path_and_create(current + "/graph")
