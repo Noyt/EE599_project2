@@ -24,3 +24,5 @@ label 0 if outside the disk centered at (0.5, 0.5) of radius 1/√2π, and 1 ins
 * Build a network with two input units, two output unit, three hidden layers of 25 units, connected by Tanh activations
 * Train it with MSE, logging the loss,
 * Compute and print the final train and the test errors, and test accuracy
+
+Adding a ``--graph`` option to either of these commands will generate a graph with the corresponding metrics. 
