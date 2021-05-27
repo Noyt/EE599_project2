@@ -24,6 +24,9 @@ def generate_train_test(nb_pairs=1000):
 
 
 def calculate_gain(activation_name: str):
+    """
+    Gain to properly adjust weight initialization according to following activation function
+    """
     if activation_name.lower() == "relu":
         return math.sqrt(2)
     elif activation_name.lower() == 'tanh':

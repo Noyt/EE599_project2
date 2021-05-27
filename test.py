@@ -7,7 +7,6 @@ from modules import *
 
 parser = argparse.ArgumentParser(description='EE-559 Project 2')
 
-
 parser.add_argument('--run_classification',
                     action='store_true', default=False,
                     help = 'Runs the experiment as a classification task rather than regression')
@@ -19,24 +18,23 @@ parser.add_argument('--seed',
 args = parser.parse_args()
 manual_seed(args.seed)
 
-
 # Deactivating autograd
 set_grad_enabled(False)
 
 train_data, test_data, train_labels, test_labels = generate_train_test()
 
 if args.run_classification:
-    gain = calculate_gain('relu')
+    gain = calculate_gain('tanh')
 
     model = Sequential(
         Linear(2, 25, gain),
-        ReLU(),
+        Tanh(),
         Linear(25, 25, gain),
-        ReLU(),
+        Tanh(),
         Linear(25, 25, gain),
-        ReLU(),
+        Tanh(),
         Linear(25, 25, gain),
-        ReLU(),
+        Tanh(),
         Linear(25, 2)
     )
 
